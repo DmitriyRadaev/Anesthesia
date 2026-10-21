@@ -1,0 +1,44 @@
+[
+ {
+  "id": 1,
+  "type": 1,
+  "name": "V basilica",
+  "description": ""
+ },
+ {
+  "id": 2,
+  "type": 1,
+  "name": "V cephalica",
+  "description": ""
+ },
+ {
+  "id": 3,
+  "type": 1,
+  "name": "Кистевая вена",
+  "description": ""
+ },
+ {
+  "id": 4,
+  "type": 2,
+  "name": "V subclavia",
+  "description": ""
+ },
+ {
+  "id": 5,
+  "type": 2,
+  "name": "V jugularis int",
+  "description": ""
+ },
+ {
+  "id": 6,
+  "type": 2,
+  "name": "V jugularis ext",
+  "description": ""
+ },
+ {
+  "id": 7,
+  "type": 2,
+  "name": "V temporalis",
+  "description": ""
+ }
+]

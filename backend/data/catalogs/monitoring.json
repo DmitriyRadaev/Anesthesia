@@ -1,0 +1,52 @@
+[
+ {
+  "id": 1,
+  "name": "MINDRAY ePM",
+  "description": ""
+ },
+ {
+  "id": 2,
+  "name": "MINDRAY BeneView T5",
+  "description": ""
+ },
+ {
+  "id": 3,
+  "name": "MINDRAY BeneView T8",
+  "description": ""
+ },
+ {
+  "id": 4,
+  "name": "MINDRAY BeneVision N15",
+  "description": ""
+ },
+ {
+  "id": 5,
+  "name": "MINDRAY BeneVision N17",
+  "description": ""
+ },
+ {
+  "id": 6,
+  "name": "MINDRAY BeneHeart D3",
+  "description": ""
+ },
+ {
+  "id": 7,
+  "name": "MINDRAY JMEC 10",
+  "description": ""
+ },
+ {
+  "id": 8,
+  "name": "MINDRAY iPM12",
+  "description": ""
+ },
+ {
+  "id": 9,
+  "name": "MINDRAY iMEC",
+  "description": ""
+ },
+ {
+  "id": 10,
+  "name": "MINDRAY iMEC8",
+  "description": ""
+ }
+]

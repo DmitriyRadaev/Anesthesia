@@ -1,0 +1,25 @@
+# секреты и локальные настройки
+.env
+*.env.local
+data/users.json
+backend/data/users.json
+
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+backend/staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+
+# IDE / OS
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,6195 @@
+openapi: 3.0.3
+info:
+  title: АРМ Анестезиология — REST API
+  version: 2.0.0
+  description: 'API системы ведения протокола анестезии и наркозной карты. Авторизация:
+    `POST /api/auth/login/` → заголовок `Authorization: Bearer <token>`.'
+paths:
+  /api/auth/change-password/:
+    post:
+      operationId: auth_change_password_create
+      summary: Смена собственного пароля
+      tags:
+      - Авторизация
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      summary: Вход в систему
+      tags:
+      - Авторизация
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+        '400':
+          description: Не заполнены поля
+        '401':
+          description: Неверный логин или пароль
+        '403':
+          description: Учётная запись деактивирована
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      summary: Выход (отзыв текущего токена)
+      tags:
+      - Авторизация
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      summary: Текущий пользователь
+      tags:
+      - Авторизация
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/catalogs/:
+    get:
+      operationId: catalogs_index
+      summary: Перечень доступных справочников
+      tags:
+      - Справочники
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogIndex'
+          description: ''
+  /api/catalogs/{slug}/:
+    get:
+      operationId: catalogs_items
+      description: 'Доступные slug: anesthesia_method, anesthesia_specificity, anesthesia_type,
+        asa, blade_number, blade_type, blood_group, blood_rh, catheter_diameter, catheter_type,
+        combi_tube_size, department, department_name, department_picked, department_type,
+        diagnosis, doctor_fio, intubation_tube_size, intuboscope_cuff_size, intuboscope_cuff_type,
+        laryngeal_mask_type, measurement_units, monitoring, oropharyngeal_catheter,
+        oxygen_mask_size, patient_status, pressure_type, rass, scale_glazgo, scale_glazgo_head,
+        scale_meyo, scale_meyo_head, sex, tube_type, type_operation, vein_cvc, vein_pvc,
+        ventilator, volume_operation. Для `department` обязателен параметр `department_type_id`;
+        для `scale_glazgo`/`scale_meyo` можно передать `head_id`; для `anesthesia_method`
+        — `type`.'
+      summary: Элементы справочника
+      parameters:
+      - in: query
+        name: department_type_id
+        schema:
+          type: integer
+      - in: query
+        name: head_id
+        schema:
+          type: integer
+      - in: path
+        name: slug
+        schema:
+          type: string
+          enum:
+          - anesthesia_method
+          - anesthesia_specificity
+          - anesthesia_type
+          - asa
+          - blade_number
+          - blade_type
+          - blood_group
+          - blood_rh
+          - catheter_diameter
+          - catheter_type
+          - combi_tube_size
+          - department
+          - department_name
+          - department_picked
+          - department_type
+          - diagnosis
+          - doctor_fio
+          - intubation_tube_size
+          - intuboscope_cuff_size
+          - intuboscope_cuff_type
+          - laryngeal_mask_type
+          - measurement_units
+          - monitoring
+          - oropharyngeal_catheter
+          - oxygen_mask_size
+          - patient_status
+          - pressure_type
+          - rass
+          - scale_glazgo
+          - scale_glazgo_head
+          - scale_meyo
+          - scale_meyo_head
+          - sex
+          - tube_type
+          - type_operation
+          - vein_cvc
+          - vein_pvc
+          - ventilator
+          - volume_operation
+        required: true
+      - in: query
+        name: type
+        schema:
+          type: string
+      tags:
+      - Справочники
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogItem'
+          description: ''
+  /api/cdss/result/{operation_id}/:
+    get:
+      operationId: cdss_result_retrieve
+      description: 'Доступ: токен клинического пользователя или заголовок `X-API-Key`
+        (INTEGRATION_API_KEY).'
+      summary: Последние показатели пациента для СППВР (CDSS)
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Мониторинг (HL7)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/health/:
+    get:
+      operationId: health_retrieve
+      summary: Проверка работоспособности (API + БД)
+      tags:
+      - Служебное
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: ''
+  /api/medicaments/:
+    get:
+      operationId: medicaments_list
+      description: '`search_name` — начало наименования (без учёта регистра); пагинация
+        по 20.'
+      summary: Поиск медикаментов
+      parameters:
+      - in: query
+        name: group
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: search_name
+        schema:
+          type: string
+        description: Начало наименования
+      tags:
+      - Медикаменты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMedicamentList'
+          description: ''
+  /api/medicaments/{id}/:
+    get:
+      operationId: medicaments_retrieve
+      summary: Медикамент
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this медикамент.
+        required: true
+      tags:
+      - Медикаменты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicament'
+          description: ''
+  /api/monitoring/hl7/:
+    post:
+      operationId: monitoring_hl7_create
+      description: 'Тело: `{"message": "MSH|...\rPID|...\rOBR|...\rOBX|..."}`. Доступ:
+        `X-API-Key` или пользователь с ролью заведующего/ИО.'
+      summary: Принять HL7-сообщение (ORU^R01)
+      tags:
+      - Мониторинг (HL7)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HL7IngestRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HL7IngestRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HL7IngestRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HL7Result'
+          description: ''
+  /api/monitoring/pids/:
+    get:
+      operationId: monitoring_pids_retrieve
+      summary: PID, от которых поступали данные за последние N минут (по умолчанию
+        10)
+      parameters:
+      - in: query
+        name: minutes
+        schema:
+          type: integer
+      tags:
+      - Мониторинг (HL7)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecentPids'
+          description: ''
+  /api/operations/:
+    get:
+      operationId: operations_list
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Список операционных случаев (фильтры, поиск, сортировка, пагинация)
+      parameters:
+      - in: query
+        name: date_from
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_to
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: doctor
+        schema:
+          type: integer
+      - in: query
+        name: mine
+        schema:
+          type: boolean
+        description: Только ОС, где пользователь — врач или медсестра
+      - in: query
+        name: nurse
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: patient
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: type_operation
+        schema:
+          type: integer
+      tags:
+      - Операционные случаи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOperationList'
+          description: ''
+    post:
+      operationId: operations_create
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Создать операционный случай
+      tags:
+      - Операционные случаи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperationWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OperationWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OperationWriteRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+          description: ''
+  /api/operations/{operation_id}/card/actions/:
+    get:
+      operationId: operations_card_actions_list
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: Анестезиологические действия
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnestheticAction'
+          description: ''
+    put:
+      operationId: operations_card_actions_update
+      description: 'Полная замена набора. Пересчитывает статус ОС: «Начало анестезии»
+        → НА ОПЕРАЦИИ, иначе ПОСТУПИЛ (для незавершённых и неотменённых ОС); карточка
+        пациента становится АКТИВНОЙ.'
+      summary: Заменить анестезиологические действия
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AnestheticActionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AnestheticActionRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AnestheticActionRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnestheticAction'
+          description: ''
+  /api/operations/{operation_id}/card/breath/:
+    get:
+      operationId: operations_card_breath_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Характеристики дыхания
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BreathCharacteristics'
+          description: ''
+    put:
+      operationId: operations_card_breath_update
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Заменить характеристики дыхания
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BreathCharacteristicsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BreathCharacteristicsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BreathCharacteristicsRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BreathCharacteristics'
+          description: ''
+  /api/operations/{operation_id}/card/cms/:
+    get:
+      operationId: operations_card_cms_retrieve
+      description: 'Окно: от времени поступления −5 минут до «Окончания анестезии»
+        (или текущего момента), не более 24 часов. Для каждого интервала берётся последнее
+        сообщение монитора.'
+      summary: Показатели мониторов для блока ЦМС (интервалы по 5 минут)
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/operations/{operation_id}/card/drugs/{section}/:
+    get:
+      operationId: operations_card_drugs_list
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Препараты раздела
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: section
+        schema:
+          type: string
+          enum:
+          - introduction
+          - maintenance
+          - premedication
+        description: premedication — премедикация, introduction — введение в анестезию,
+          maintenance — поддержание анестезии
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DrugGroup'
+          description: ''
+    put:
+      operationId: operations_card_drugs_update
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Заменить препараты раздела
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: section
+        schema:
+          type: string
+          enum:
+          - introduction
+          - maintenance
+          - premedication
+        description: premedication — премедикация, introduction — введение в анестезию,
+          maintenance — поддержание анестезии
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DrugGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DrugGroupRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DrugGroupRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DrugGroup'
+          description: ''
+  /api/operations/{operation_id}/card/drugs/totals/:
+    get:
+      operationId: operations_card_drugs_totals_list
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Итоговые дозы препаратов (по всем разделам)
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DoseTotal'
+          description: ''
+  /api/operations/{operation_id}/card/infusions/:
+    get:
+      operationId: operations_card_infusions_list
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Инфузионная терапия
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InfusionGroup'
+          description: ''
+    put:
+      operationId: operations_card_infusions_update
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Заменить инфузионную терапию
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/InfusionGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/InfusionGroupRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/InfusionGroupRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InfusionGroup'
+          description: ''
+  /api/operations/{operation_id}/card/liquids/:
+    get:
+      operationId: operations_card_liquids_list
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Жидкостные потери
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiquidGroup'
+          description: ''
+    put:
+      operationId: operations_card_liquids_update
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Заменить жидкостные потери
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LiquidGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LiquidGroupRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LiquidGroupRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiquidGroup'
+          description: ''
+  /api/operations/{operation_id}/card/patient-info/:
+    get:
+      operationId: operations_card_patient_info_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Сведения о пациенте и операции в наркозной карте
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardPatientInfo'
+          description: ''
+    patch:
+      operationId: operations_card_patient_info_partial_update
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Изменить сведения о пациенте и операции в наркозной карте
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCardPatientInfoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCardPatientInfoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCardPatientInfoRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardPatientInfo'
+          description: ''
+  /api/operations/{operation_id}/card/pid-datetime/:
+    patch:
+      operationId: operations_card_pid_datetime_partial_update
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Изменить PID, дату операции и время поступления
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPidDateTimeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPidDateTimeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPidDateTimeRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PidDateTime'
+          description: ''
+  /api/operations/{operation_id}/card/print/:
+    get:
+      operationId: operations_card_print_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Данные для печатной формы наркозной карты
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/operations/{operation_id}/card/stages/:
+    get:
+      operationId: operations_card_stages_list
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Этапы операции (6 этапов)
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OperationStage'
+          description: ''
+    put:
+      operationId: operations_card_stages_update
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Изменить этапы операции
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OperationStageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OperationStageRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OperationStageRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OperationStage'
+          description: ''
+  /api/operations/{operation_id}/card/transfusions/:
+    get:
+      operationId: operations_card_transfusions_list
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Трансфузионная терапия
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransfusionGroup'
+          description: ''
+    put:
+      operationId: operations_card_transfusions_update
+      description: 'Набор строк, сгруппированных по наименованию: ``[{<group_field>:
+        "...", "items": [...]}, ...]``.'
+      summary: Заменить трансфузионную терапию
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Наркозная карта
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransfusionGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransfusionGroupRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransfusionGroupRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransfusionGroup'
+          description: ''
+  /api/operations/{operation_id}/labs/:
+    get:
+      operationId: operations_labs_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Результаты лабораторного мониторинга
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Лабораторный мониторинг
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabResult'
+          description: ''
+    put:
+      operationId: operations_labs_update
+      description: Полная замена значений. Структура и допустимые значения — `GET
+        .../labs/schema/`.
+      summary: Сохранить результаты лабораторного мониторинга
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Лабораторный мониторинг
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabResultRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LabResultRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LabResultRequestRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabResult'
+          description: ''
+  /api/operations/{operation_id}/labs/schema/:
+    get:
+      operationId: operations_labs_schema_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Структура формы лабораторного мониторинга
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Лабораторный мониторинг
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/operations/{operation_id}/monitoring/results/:
+    get:
+      operationId: operations_monitoring_results_retrieve
+      description: По умолчанию — окно ОС (поступление −5 мин … окончание анестезии/сейчас).
+        `date_start` — вернуть измерения строго после указанного момента (инкрементальная
+        подгрузка).
+      summary: Показатели мониторов по ОС (для графиков)
+      parameters:
+      - in: query
+        name: date_end
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: date_start
+        schema:
+          type: string
+          format: date-time
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Мониторинг (HL7)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationResults'
+          description: ''
+  /api/operations/{operation_id}/protocol/airway/:
+    get:
+      operationId: operations_protocol_airway_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Обеспечение проходимости дыхательных путей
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TubeMaskInstallation'
+          description: ''
+    put:
+      operationId: operations_protocol_airway_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Обеспечение проходимости дыхательных путей: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TubeMaskInstallationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TubeMaskInstallationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TubeMaskInstallationRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TubeMaskInstallation'
+          description: ''
+    patch:
+      operationId: operations_protocol_airway_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Обеспечение проходимости дыхательных путей: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTubeMaskInstallationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTubeMaskInstallationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTubeMaskInstallationRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TubeMaskInstallation'
+          description: ''
+  /api/operations/{operation_id}/protocol/information-anesthesia/:
+    get:
+      operationId: operations_protocol_information_anesthesia_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Сведения об анестезии
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationAnesthesia'
+          description: ''
+    put:
+      operationId: operations_protocol_information_anesthesia_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Сведения об анестезии: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InformationAnesthesiaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InformationAnesthesiaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InformationAnesthesiaRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationAnesthesia'
+          description: ''
+    patch:
+      operationId: operations_protocol_information_anesthesia_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Сведения об анестезии: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedInformationAnesthesiaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedInformationAnesthesiaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedInformationAnesthesiaRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationAnesthesia'
+          description: ''
+  /api/operations/{operation_id}/protocol/laryngeal-masks/:
+    get:
+      operationId: operations_protocol_laryngeal_masks_list
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: Установка ларингеальных масок
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LaryngealMaskInstallation'
+          description: ''
+    put:
+      operationId: operations_protocol_laryngeal_masks_update
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: 'Установка ларингеальных масок: заменить набор'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LaryngealMaskInstallationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LaryngealMaskInstallationRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LaryngealMaskInstallationRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LaryngealMaskInstallation'
+          description: ''
+  /api/operations/{operation_id}/protocol/maintaining-anesthesia/:
+    get:
+      operationId: operations_protocol_maintaining_anesthesia_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Поддержание анестезии
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainingAnesthesia'
+          description: ''
+    put:
+      operationId: operations_protocol_maintaining_anesthesia_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Поддержание анестезии: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintainingAnesthesiaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MaintainingAnesthesiaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MaintainingAnesthesiaRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainingAnesthesia'
+          description: ''
+    patch:
+      operationId: operations_protocol_maintaining_anesthesia_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Поддержание анестезии: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMaintainingAnesthesiaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMaintainingAnesthesiaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMaintainingAnesthesiaRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainingAnesthesia'
+          description: ''
+  /api/operations/{operation_id}/protocol/patient-info/:
+    get:
+      operationId: operations_protocol_patient_info_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Сведения о пациенте в протоколе
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolPatientInfo'
+          description: ''
+    patch:
+      operationId: operations_protocol_patient_info_partial_update
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Изменить жалобы, анамнез, рост и вес
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProtocolPatientInfoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProtocolPatientInfoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProtocolPatientInfoRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolPatientInfo'
+          description: ''
+  /api/operations/{operation_id}/protocol/patient-transferred/:
+    get:
+      operationId: operations_protocol_patient_transferred_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Пациент передан
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientTransferred'
+          description: ''
+    put:
+      operationId: operations_protocol_patient_transferred_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Пациент передан: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientTransferredRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientTransferredRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientTransferredRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientTransferred'
+          description: ''
+    patch:
+      operationId: operations_protocol_patient_transferred_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Пациент передан: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientTransferredRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientTransferredRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientTransferredRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientTransferred'
+          description: ''
+  /api/operations/{operation_id}/protocol/premedication/:
+    get:
+      operationId: operations_protocol_premedication_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Премедикация
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Premedication'
+          description: ''
+    put:
+      operationId: operations_protocol_premedication_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Премедикация: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PremedicationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PremedicationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PremedicationRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Premedication'
+          description: ''
+    patch:
+      operationId: operations_protocol_premedication_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Премедикация: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPremedicationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPremedicationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPremedicationRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Premedication'
+          description: ''
+  /api/operations/{operation_id}/protocol/print/:
+    get:
+      operationId: operations_protocol_print_retrieve
+      description: Находит ОС по `operation_id` (404, если не найден). Доступ — клинический
+        персонал.
+      summary: Данные для печатной формы протокола анестезии
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/operations/{operation_id}/protocol/redirecting-patient/:
+    get:
+      operationId: operations_protocol_redirecting_patient_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Направление пациента
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedirectingPatient'
+          description: ''
+    put:
+      operationId: operations_protocol_redirecting_patient_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Направление пациента: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedirectingPatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RedirectingPatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RedirectingPatientRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedirectingPatient'
+          description: ''
+    patch:
+      operationId: operations_protocol_redirecting_patient_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Направление пациента: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRedirectingPatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRedirectingPatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRedirectingPatientRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedirectingPatient'
+          description: ''
+  /api/operations/{operation_id}/protocol/tube-installations/:
+    get:
+      operationId: operations_protocol_tube_installations_list
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: Установка трубок
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TubeInstallationPick'
+          description: ''
+    put:
+      operationId: operations_protocol_tube_installations_update
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: 'Установка трубок: заменить набор'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TubeInstallationPickRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TubeInstallationPickRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TubeInstallationPickRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TubeInstallationPick'
+          description: ''
+  /api/operations/{operation_id}/protocol/venous-access/cvc/:
+    get:
+      operationId: operations_protocol_venous_access_cvc_list
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: Венозный доступ ЦВК
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VenousAccess'
+          description: ''
+    put:
+      operationId: operations_protocol_venous_access_cvc_update
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: 'Венозный доступ ЦВК: заменить набор'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/VenousAccessRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/VenousAccessRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/VenousAccessRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VenousAccess'
+          description: ''
+  /api/operations/{operation_id}/protocol/venous-access/pvc/:
+    get:
+      operationId: operations_protocol_venous_access_pvc_list
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: Венозный доступ ПВК
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VenousAccess'
+          description: ''
+    put:
+      operationId: operations_protocol_venous_access_pvc_update
+      description: Набор строк, принадлежащих ОС. PUT полностью заменяет набор (как
+        PATCH исходной системы).
+      summary: 'Венозный доступ ПВК: заменить набор'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/VenousAccessRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/VenousAccessRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/VenousAccessRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VenousAccess'
+          description: ''
+  /api/operations/{operation_id}/protocol/ventilator/:
+    get:
+      operationId: operations_protocol_ventilator_retrieve
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: Аппарат ИВЛ (НДА) и мониторинг
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ventilator'
+          description: ''
+    put:
+      operationId: operations_protocol_ventilator_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Аппарат ИВЛ (НДА) и мониторинг: полная замена'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VentilatorRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VentilatorRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VentilatorRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ventilator'
+          description: ''
+    patch:
+      operationId: operations_protocol_ventilator_partial_update
+      description: |-
+        Блок «один к одному» с ОС. GET возвращает пустую форму, если блок ещё не заполнен.
+
+        PUT — полная замена значений, PATCH — частичное обновление.
+      summary: 'Аппарат ИВЛ (НДА) и мониторинг: частичное изменение'
+      parameters:
+      - in: path
+        name: operation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Протокол анестезии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVentilatorRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVentilatorRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVentilatorRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ventilator'
+          description: ''
+  /api/operations/{id}/:
+    get:
+      operationId: operations_retrieve
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Операционный случай (полная информация)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Операционные случаи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+          description: ''
+    put:
+      operationId: operations_update
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Изменить операционный случай
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Операционные случаи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperationWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OperationWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OperationWriteRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+          description: ''
+    patch:
+      operationId: operations_partial_update
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Частично изменить операционный случай
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Операционные случаи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOperationWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOperationWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOperationWriteRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+          description: ''
+  /api/operations/{id}/cancel/:
+    post:
+      operationId: operations_cancel_create
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Отменить операционный случай
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Операционные случаи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelOperationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CancelOperationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CancelOperationRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+          description: ''
+  /api/operations/{id}/finish/:
+    post:
+      operationId: operations_finish_create
+      description: Операционные случаи. Удаление ОС не предусмотрено (как в исходной
+        системе) — используйте отмену.
+      summary: Завершить операционный случай (требуется «Окончание анестезии»)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Операционные случаи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+          description: ''
+  /api/patients/:
+    get:
+      operationId: patients_list
+      description: 'Реестр с вложенными операционными случаями. Сортировка по умолчанию
+        повторяет исходную систему: статус карточки → статус актуального ОС → дата/время
+        операции (по убыванию). Фильтры: `status` (1 — новая, 2 — активная, 3 — архивная;
+        можно несколько), `search_surname` (начало фамилии), `mine=true` («Мои пациенты»).
+        Пагинация по 20.'
+      summary: Реестр пациентов
+      parameters:
+      - in: query
+        name: mine
+        schema:
+          type: boolean
+        description: Только пациенты текущего пользователя
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: search_surname
+        schema:
+          type: string
+        description: Начало фамилии (без учёта регистра)
+      - in: query
+        name: sex
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - Пациенты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientList'
+          description: ''
+    post:
+      operationId: patients_create
+      summary: Создать карточку пациента
+      tags:
+      - Пациенты
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/patients/{id}/:
+    get:
+      operationId: patients_retrieve
+      summary: Карточка пациента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пациенты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    put:
+      operationId: patients_update
+      summary: Изменить карточку пациента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пациенты
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    patch:
+      operationId: patients_partial_update
+      summary: Частично изменить карточку пациента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пациенты
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    delete:
+      operationId: patients_destroy
+      summary: Удалить карточку пациента (только без ОС; заведующий/ИО)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пациенты
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/patients/{id}/archive/:
+    post:
+      operationId: patients_archive_create
+      summary: Перевести карточку в архив
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пациенты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/patients/{id}/unarchive/:
+    post:
+      operationId: patients_unarchive_create
+      summary: Вернуть карточку из архива (статус «Активная»)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пациенты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/reports/4110/:
+    get:
+      operationId: reports_4110_retrieve
+      summary: Отчёт 41.10 — файл Excel
+      parameters:
+      - in: query
+        name: date_end
+        schema:
+          type: string
+          format: date
+        description: Дата окончания периода (YYYY-MM-DD)
+        required: true
+      - in: query
+        name: date_start
+        schema:
+          type: string
+          format: date
+        description: Дата начала периода (YYYY-MM-DD)
+        required: true
+      tags:
+      - Отчёты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+          description: Файл .xlsx
+  /api/reports/4110/data/:
+    get:
+      operationId: reports_4110_data_retrieve
+      summary: Отчёт 41.10 — данные (JSON)
+      parameters:
+      - in: query
+        name: date_end
+        schema:
+          type: string
+          format: date
+        description: Дата окончания периода (YYYY-MM-DD)
+        required: true
+      - in: query
+        name: date_start
+        schema:
+          type: string
+          format: date
+        description: Дата начала периода (YYYY-MM-DD)
+        required: true
+      tags:
+      - Отчёты
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/users/:
+    get:
+      operationId: users_list
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Список пользователей (поиск, фильтры, сортировка, пагинация)
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Пользователи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: users_create
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Создать пользователя
+      tags:
+      - Пользователи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Пользователь
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пользователи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Изменить пользователя
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пользователи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Частично изменить пользователя (роль, активность, профиль)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пользователи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/set-password/:
+    post:
+      operationId: users_set_password_create
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Установить пароль пользователю
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Пользователи
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/medical-staff/:
+    get:
+      operationId: users_medical_staff_retrieve
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Медицинский персонал (активные врачи и медсёстры)
+      tags:
+      - Пользователи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicalStaff'
+          description: ''
+  /api/users/roles/:
+    get:
+      operationId: users_roles_list
+      description: Управление пользователями. Доступно Администратору, Заведующему
+        и ИО заведующего.
+      summary: Справочник ролей
+      tags:
+      - Пользователи
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+          description: ''
+components:
+  schemas:
+    AnestheticAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        time:
+          type: string
+          format: date-time
+          title: Время
+        value:
+          allOf:
+          - $ref: '#/components/schemas/ValueEnum'
+          title: Действие
+        value_display:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - time
+      - value
+      - value_display
+    AnestheticActionRequest:
+      type: object
+      properties:
+        time:
+          type: string
+          format: date-time
+          title: Время
+        value:
+          allOf:
+          - $ref: '#/components/schemas/ValueEnum'
+          title: Действие
+      required:
+      - time
+      - value
+    ArmEnum:
+      enum:
+      - L
+      - R
+      type: string
+      description: |-
+        * `L` - Левая
+        * `R` - Правая
+    BlankEnum:
+      enum:
+      - ''
+    BreathCharacteristics:
+      type: object
+      properties:
+        spontaneous:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreathInterval'
+        supportive:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreathInterval'
+        forced:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreathInterval'
+    BreathCharacteristicsRequest:
+      type: object
+      properties:
+        spontaneous:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreathIntervalRequest'
+        supportive:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreathIntervalRequest'
+        forced:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreathIntervalRequest'
+    BreathInterval:
+      type: object
+      properties:
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+      required:
+      - time_end
+      - time_start
+    BreathIntervalRequest:
+      type: object
+      properties:
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+      required:
+      - time_end
+      - time_start
+    CancelOperationRequest:
+      type: object
+      properties:
+        reason_cancel:
+          type: string
+          minLength: 1
+          description: Причина отмены ОС
+          maxLength: 500
+      required:
+      - reason_cancel
+    CardPatientInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        surname:
+          type: string
+          readOnly: true
+        firstname:
+          type: string
+          readOnly: true
+        lastname:
+          type: string
+          readOnly: true
+        birthdate:
+          type: string
+          format: date
+          readOnly: true
+        sex:
+          type: integer
+          readOnly: true
+        blood_group:
+          type: integer
+          readOnly: true
+        blood_rh:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OperationStatusEnum'
+          readOnly: true
+          title: Статус
+        operation_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+          title: Дата операции
+        operation_time:
+          type: string
+          format: time
+          readOnly: true
+          nullable: true
+          title: Время поступления в операционную
+        pid:
+          type: string
+          readOnly: true
+          title: PID пациента в мониторах
+        operation_code:
+          type: string
+          readOnly: true
+          title: Код операции
+        asa:
+          type: integer
+          nullable: true
+        volume_operation:
+          type: integer
+          nullable: true
+          title: Объём операции
+        department:
+          type: integer
+          nullable: true
+          title: Отделение
+        drug_intolerance:
+          type: string
+          title: Непереносимость препаратов
+        type_operation:
+          type: integer
+          title: Тип операции
+        ventilator:
+          type: integer
+          nullable: true
+          title: Аппарат ИВЛ
+        monitoring:
+          type: integer
+          nullable: true
+          title: Монитор
+        operation_name:
+          type: string
+          title: Наименование операции
+          maxLength: 500
+        diagnosis_name:
+          type: string
+          title: Диагноз
+          maxLength: 500
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Вес, кг
+        bmi:
+          type: number
+          format: double
+          readOnly: true
+      required:
+      - birthdate
+      - blood_group
+      - blood_rh
+      - bmi
+      - firstname
+      - id
+      - lastname
+      - operation_code
+      - operation_date
+      - operation_name
+      - operation_time
+      - pid
+      - sex
+      - status
+      - surname
+      - type_operation
+    CatalogIndex:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+      required:
+      - slug
+      - title
+    CatalogItem:
+      type: object
+      description: Общая форма элемента справочника (у части справочников есть дополнительные
+        поля).
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - id
+      - name
+    ChangePasswordRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        old_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - old_password
+      - password
+    DoseTotal:
+      type: object
+      properties:
+        drug:
+          type: string
+        dose:
+          type: number
+          format: double
+        unit:
+          type: string
+        text:
+          type: string
+      required:
+      - dose
+      - drug
+      - text
+      - unit
+    DrugGroup:
+      type: object
+      properties:
+        drug:
+          type: string
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugItem'
+      required:
+      - drug
+      - items
+    DrugGroupRequest:
+      type: object
+      properties:
+        drug:
+          type: string
+          minLength: 1
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugItemRequest'
+      required:
+      - drug
+      - items
+    DrugItem:
+      type: object
+      properties:
+        injection_type:
+          $ref: '#/components/schemas/InjectionTypeEnum'
+        measurement_unit:
+          type: integer
+        dose:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+          description: Для инфузии без окончания — продолжается
+      required:
+      - dose
+      - injection_type
+      - measurement_unit
+      - time_start
+    DrugItemRequest:
+      type: object
+      properties:
+        injection_type:
+          $ref: '#/components/schemas/InjectionTypeEnum'
+        measurement_unit:
+          type: integer
+        dose:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+          description: Для инфузии без окончания — продолжается
+      required:
+      - dose
+      - injection_type
+      - measurement_unit
+      - time_start
+    EndobronchialTube:
+      type: object
+      properties:
+        type:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/EndobronchialTubeTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        size_id:
+          type: integer
+          nullable: true
+    EndobronchialTubeRequest:
+      type: object
+      properties:
+        type:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/EndobronchialTubeTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        size_id:
+          type: integer
+          nullable: true
+    EndobronchialTubeTypeEnum:
+      enum:
+      - L
+      - R
+      type: string
+      description: "* `L` - L\n* `R` - R\n* `` - "
+    HL7IngestRequestRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+      required:
+      - message
+    HL7Result:
+      type: object
+      properties:
+        observation_at:
+          type: string
+          format: date-time
+          title: Время измерения
+        pid:
+          type: string
+          title: PID пациента
+          maxLength: 64
+        department:
+          type: string
+          title: Отделение
+          maxLength: 128
+        room:
+          type: string
+          title: Палата
+          maxLength: 64
+        bed:
+          type: string
+          title: Койка
+          maxLength: 64
+        device:
+          type: string
+          title: Устройство
+          maxLength: 128
+        observations:
+          title: Показатели
+      required:
+      - observation_at
+      - pid
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+        database:
+          type: string
+      required:
+      - database
+      - status
+    InformationAnesthesia:
+      type: object
+      properties:
+        anesthesia_methods:
+          type: array
+          items:
+            type: integer
+          description: ID методов анестезии
+        anesthesia_types:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+          description: Выбранные методы, сгруппированные GENERAL/LOCAL
+        patient_arrived:
+          type: boolean
+          nullable: true
+          title: Пациент доставлен, начат мониторинг, обеспечен венозный доступ
+        date_arrival:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        time_anesthesia_start:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+      required:
+      - anesthesia_types
+      - date_arrival
+      - time_anesthesia_start
+    InformationAnesthesiaRequest:
+      type: object
+      properties:
+        anesthesia_methods:
+          type: array
+          items:
+            type: integer
+          description: ID методов анестезии
+        patient_arrived:
+          type: boolean
+          nullable: true
+          title: Пациент доставлен, начат мониторинг, обеспечен венозный доступ
+    InfusionGroup:
+      type: object
+      properties:
+        solution:
+          type: string
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InfusionItem'
+      required:
+      - items
+      - solution
+    InfusionGroupRequest:
+      type: object
+      properties:
+        solution:
+          type: string
+          minLength: 1
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InfusionItemRequest'
+      required:
+      - items
+      - solution
+    InfusionItem:
+      type: object
+      properties:
+        dose:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Объём, мл
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - dose
+      - time_start
+    InfusionItemRequest:
+      type: object
+      properties:
+        dose:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Объём, мл
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - dose
+      - time_start
+    InjectionTypeEnum:
+      enum:
+      - BOLUS
+      - INFUSION
+      type: string
+      description: |-
+        * `BOLUS` - Болюсное
+        * `INFUSION` - Инфузионное
+    IntubationMethodEnum:
+      enum:
+      - INTUBOSCOPY
+      - TRACHEOSTOMY
+      - CONICOTOMY
+      type: string
+      description: |-
+        * `INTUBOSCOPY` - Интубоскопия
+        * `TRACHEOSTOMY` - Трахеостомия
+        * `CONICOTOMY` - Коникотомия
+    IntubationTube:
+      type: object
+      properties:
+        type:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/IntubationTubeTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        cuff:
+          type: boolean
+          nullable: true
+          description: Манжета низкого давления
+        size_id:
+          type: integer
+          nullable: true
+    IntubationTubeRequest:
+      type: object
+      properties:
+        type:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/IntubationTubeTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        cuff:
+          type: boolean
+          nullable: true
+          description: Манжета низкого давления
+        size_id:
+          type: integer
+          nullable: true
+    IntubationTubeTypeEnum:
+      enum:
+      - OROTRACHEAL
+      - NASOTRACHEAL
+      type: string
+      description: "* `OROTRACHEAL` - OROTRACHEAL\n* `NASOTRACHEAL` - NASOTRACHEAL\n\
+        * `` - "
+    LabResult:
+      type: object
+      properties:
+        values:
+          type: object
+          additionalProperties: {}
+          description: '{раздел: {показатель: значение}}'
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_by_name:
+          type: string
+          nullable: true
+      required:
+      - updated_at
+      - updated_by_name
+      - values
+    LabResultRequestRequest:
+      type: object
+      properties:
+        values:
+          type: object
+          additionalProperties: {}
+      required:
+      - values
+    LaryngealMaskInstallation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        laryngeal_mask_type:
+          type: integer
+        option:
+          title: Опция
+          oneOf:
+          - $ref: '#/components/schemas/OptionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        option_ext:
+          type: string
+          title: Доп. опция
+          maxLength: 255
+        blade_type:
+          type: integer
+          nullable: true
+        blade_number:
+          type: integer
+          nullable: true
+        tube_installed:
+          type: boolean
+          nullable: true
+        attempts_number:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        intuboscope_cuff_type:
+          type: integer
+          nullable: true
+        intuboscope_cuff_size:
+          type: integer
+          nullable: true
+        oropharyngeal_catheter:
+          type: integer
+          nullable: true
+        oropharyngeal_catheter_ext:
+          type: integer
+          nullable: true
+      required:
+      - id
+      - laryngeal_mask_type
+    LaryngealMaskInstallationRequest:
+      type: object
+      properties:
+        laryngeal_mask_type:
+          type: integer
+        option:
+          title: Опция
+          oneOf:
+          - $ref: '#/components/schemas/OptionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        option_ext:
+          type: string
+          title: Доп. опция
+          maxLength: 255
+        blade_type:
+          type: integer
+          nullable: true
+        blade_number:
+          type: integer
+          nullable: true
+        tube_installed:
+          type: boolean
+          nullable: true
+        attempts_number:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        intuboscope_cuff_type:
+          type: integer
+          nullable: true
+        intuboscope_cuff_size:
+          type: integer
+          nullable: true
+        oropharyngeal_catheter:
+          type: integer
+          nullable: true
+        oropharyngeal_catheter_ext:
+          type: integer
+          nullable: true
+      required:
+      - laryngeal_mask_type
+    LaryngealTube:
+      type: object
+      properties:
+        is_installed:
+          type: boolean
+          default: false
+        size_id:
+          type: integer
+          nullable: true
+    LaryngealTubeRequest:
+      type: object
+      properties:
+        is_installed:
+          type: boolean
+          default: false
+        size_id:
+          type: integer
+          nullable: true
+    Laryngoscopy:
+      type: object
+      properties:
+        type:
+          default: ''
+          description: "DL — прямая, VL — изогнутая, VP — с подвижным наконечником\n\
+            \n* `DL` - DL\n* `VL` - VL\n* `VP` - VP\n* `` - "
+          oneOf:
+          - $ref: '#/components/schemas/LaryngoscopyTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        blade_type_id:
+          type: integer
+          nullable: true
+    LaryngoscopyRequest:
+      type: object
+      properties:
+        type:
+          default: ''
+          description: "DL — прямая, VL — изогнутая, VP — с подвижным наконечником\n\
+            \n* `DL` - DL\n* `VL` - VL\n* `VP` - VP\n* `` - "
+          oneOf:
+          - $ref: '#/components/schemas/LaryngoscopyTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        blade_type_id:
+          type: integer
+          nullable: true
+    LaryngoscopyTypeEnum:
+      enum:
+      - DL
+      - VL
+      - VP
+      type: string
+      description: "* `DL` - DL\n* `VL` - VL\n* `VP` - VP\n* `` - "
+    LiquidGroup:
+      type: object
+      properties:
+        liquid:
+          type: string
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LiquidItem'
+      required:
+      - items
+      - liquid
+    LiquidGroupRequest:
+      type: object
+      properties:
+        liquid:
+          type: string
+          minLength: 1
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LiquidItemRequest'
+      required:
+      - items
+      - liquid
+    LiquidItem:
+      type: object
+      properties:
+        volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Объём, мл
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - time_start
+      - volume
+    LiquidItemRequest:
+      type: object
+      properties:
+        volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Объём, мл
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - time_start
+      - volume
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        password:
+          type: string
+          minLength: 1
+      required:
+      - password
+      - username
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - expires_at
+      - token
+      - user
+    MaintainingAnesthesia:
+      type: object
+      properties:
+        anesthesia_specificity:
+          type: integer
+          nullable: true
+        index_bis:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+          title: Индекс BIS
+        anesthesia_type:
+          type: integer
+          nullable: true
+        symptomatic_picked:
+          type: boolean
+          nullable: true
+          title: Симптоматическая терапия
+        symptomatic_option:
+          type: string
+          title: Симптоматическая терапия (описание)
+        oropharyngeal_catheter:
+          type: integer
+          nullable: true
+        option_mg:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Доза, мг
+    MaintainingAnesthesiaRequest:
+      type: object
+      properties:
+        anesthesia_specificity:
+          type: integer
+          nullable: true
+        index_bis:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+          title: Индекс BIS
+        anesthesia_type:
+          type: integer
+          nullable: true
+        symptomatic_picked:
+          type: boolean
+          nullable: true
+          title: Симптоматическая терапия
+        symptomatic_option:
+          type: string
+          title: Симптоматическая терапия (описание)
+        oropharyngeal_catheter:
+          type: integer
+          nullable: true
+        option_mg:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Доза, мг
+    MedicalStaff:
+      type: object
+      properties:
+        doctors:
+          type: array
+          items:
+            $ref: '#/components/schemas/StaffMember'
+        nurses:
+          type: array
+          items:
+            $ref: '#/components/schemas/StaffMember'
+      required:
+      - doctors
+      - nurses
+    Medicament:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Наименование
+          maxLength: 500
+        group:
+          type: integer
+          title: Группа
+        group_name:
+          type: string
+          readOnly: true
+      required:
+      - group
+      - group_name
+      - id
+      - name
+    Operation:
+      type: object
+      description: Полная информация об ОС (аналог operations_show исходной системы).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+          readOnly: true
+          title: Пациент
+        patient_info:
+          allOf:
+          - $ref: '#/components/schemas/PatientSummary'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OperationStatusEnum'
+          readOnly: true
+          title: Статус
+        status_display:
+          type: string
+          readOnly: true
+        operation_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+          title: Дата операции
+        operation_time:
+          type: string
+          format: time
+          readOnly: true
+          nullable: true
+          title: Время поступления в операционную
+        pid:
+          type: string
+          readOnly: true
+          title: PID пациента в мониторах
+        type_operation:
+          type: integer
+          readOnly: true
+          title: Тип операции
+        type_operation_name:
+          type: string
+          readOnly: true
+        operation_name:
+          type: string
+          readOnly: true
+          title: Наименование операции
+        operation_code:
+          type: string
+          readOnly: true
+          title: Код операции
+        federal_code:
+          type: string
+          readOnly: true
+          title: Федеральный код
+        diagnosis:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Диагноз (МКБ-10)
+        diagnosis_name:
+          type: string
+          readOnly: true
+          title: Диагноз
+        history_number:
+          type: string
+          readOnly: true
+          title: Номер истории болезни
+        asa:
+          type: integer
+          readOnly: true
+          nullable: true
+        volume_operation:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Объём операции
+        department:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Отделение
+        ventilator:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Аппарат ИВЛ
+        monitoring:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Монитор
+        complaints_patient:
+          type: string
+          readOnly: true
+          title: Жалобы пациента
+        features_anamnesis:
+          type: string
+          readOnly: true
+          title: Особенности анамнеза
+        drug_intolerance:
+          type: string
+          readOnly: true
+          title: Непереносимость препаратов
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+          nullable: true
+          title: Вес, кг
+        bmi:
+          type: number
+          format: double
+          readOnly: true
+        reason_cancel:
+          type: string
+          readOnly: true
+          title: Причина отмены
+        doctor:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Врач-анестезиолог
+        doctor_name:
+          type: string
+          readOnly: true
+        nurse:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Медсестра-анестезист
+        nurse_name:
+          type: string
+          readOnly: true
+        is_anesthesia_started:
+          type: boolean
+          readOnly: true
+        is_anesthesia_stopped:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создан
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Изменён
+      required:
+      - asa
+      - bmi
+      - complaints_patient
+      - created_at
+      - department
+      - diagnosis
+      - diagnosis_name
+      - doctor
+      - doctor_name
+      - drug_intolerance
+      - features_anamnesis
+      - federal_code
+      - height
+      - history_number
+      - id
+      - is_anesthesia_started
+      - is_anesthesia_stopped
+      - monitoring
+      - nurse
+      - nurse_name
+      - operation_code
+      - operation_date
+      - operation_name
+      - operation_time
+      - patient
+      - patient_info
+      - pid
+      - reason_cancel
+      - status
+      - status_display
+      - type_operation
+      - type_operation_name
+      - updated_at
+      - ventilator
+      - volume_operation
+      - weight
+    OperationBrief:
+      type: object
+      description: ОС в составе карточки пациента / реестра.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OperationStatusEnum'
+          readOnly: true
+          title: Статус
+        status_display:
+          type: string
+          readOnly: true
+        operation_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+          title: Дата операции
+        operation_time:
+          type: string
+          format: time
+          readOnly: true
+          nullable: true
+          title: Время поступления в операционную
+        type_operation:
+          type: integer
+          readOnly: true
+          title: Тип операции
+        type_operation_name:
+          type: string
+          readOnly: true
+        operation_name:
+          type: string
+          readOnly: true
+          title: Наименование операции
+        diagnosis_name:
+          type: string
+          readOnly: true
+          title: Диагноз
+        pid:
+          type: string
+          readOnly: true
+          title: PID пациента в мониторах
+        reason_cancel:
+          type: string
+          readOnly: true
+          title: Причина отмены
+        doctor:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Врач-анестезиолог
+        doctor_name:
+          type: string
+          readOnly: true
+        nurse:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Медсестра-анестезист
+        nurse_name:
+          type: string
+          readOnly: true
+      required:
+      - diagnosis_name
+      - doctor
+      - doctor_name
+      - id
+      - nurse
+      - nurse_name
+      - operation_date
+      - operation_name
+      - operation_time
+      - pid
+      - reason_cancel
+      - status
+      - status_display
+      - type_operation
+      - type_operation_name
+    OperationResults:
+      type: object
+      properties:
+        pid:
+          type: string
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HL7Result'
+      required:
+      - count
+      - pid
+      - results
+    OperationStage:
+      type: object
+      properties:
+        stage:
+          type: integer
+          maximum: 6
+          minimum: 1
+        time_start:
+          type: string
+          format: date-time
+          nullable: true
+          title: Время
+        description:
+          type: string
+          title: Описание
+          maxLength: 500
+      required:
+      - stage
+    OperationStageRequest:
+      type: object
+      properties:
+        stage:
+          type: integer
+          maximum: 6
+          minimum: 1
+        time_start:
+          type: string
+          format: date-time
+          nullable: true
+          title: Время
+        description:
+          type: string
+          title: Описание
+          maxLength: 500
+      required:
+      - stage
+    OperationStatusEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      type: integer
+      description: |-
+        * `1` - Поступил
+        * `2` - На операции
+        * `3` - Завершён
+        * `4` - Отменён
+    OperationWriteRequest:
+      type: object
+      description: Создание/изменение ОС (карточка ОС).
+      properties:
+        patient:
+          type: integer
+          title: Пациент
+        operation_date:
+          type: string
+          format: date
+        operation_time:
+          type: string
+          format: time
+          nullable: true
+          title: Время поступления в операционную
+        pid:
+          type: string
+          title: PID пациента в мониторах
+          maxLength: 64
+        type_operation:
+          type: integer
+          title: Тип операции
+        operation_name:
+          type: string
+          minLength: 1
+          title: Наименование операции
+          maxLength: 500
+        operation_code:
+          type: string
+          title: Код операции
+          maxLength: 64
+        diagnosis:
+          type: integer
+          nullable: true
+          title: Диагноз (МКБ-10)
+        diagnosis_name:
+          type: string
+          title: Диагноз
+          maxLength: 500
+        history_number:
+          type: string
+          title: Номер истории болезни
+          maxLength: 64
+        doctor:
+          type: integer
+          nullable: true
+        nurse:
+          type: integer
+          nullable: true
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Вес, кг
+      required:
+      - operation_date
+      - operation_name
+      - patient
+      - type_operation
+    OptionEnum:
+      enum:
+      - DL
+      - VL
+      - VP
+      - CON
+      - TRA
+      - RG
+      - TBD
+      type: string
+      description: |-
+        * `DL` - Ларингоскопия прямая
+        * `VL` - Ларингоскопия изогнутым клинком
+        * `VP` - Ларингоскопия клинком с подвижным наконечником
+        * `CON` - Коникотомия
+        * `TRA` - Трахеостомия
+        * `RG` - Санация ротоглотки
+        * `TBD` - Санация ТБД
+    PaginatedMedicamentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medicament'
+    PaginatedOperationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+    PaginatedPatientList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Patient'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PatchedCardPatientInfoRequest:
+      type: object
+      properties:
+        asa:
+          type: integer
+          nullable: true
+        volume_operation:
+          type: integer
+          nullable: true
+          title: Объём операции
+        department:
+          type: integer
+          nullable: true
+          title: Отделение
+        drug_intolerance:
+          type: string
+          title: Непереносимость препаратов
+        type_operation:
+          type: integer
+          title: Тип операции
+        ventilator:
+          type: integer
+          nullable: true
+          title: Аппарат ИВЛ
+        monitoring:
+          type: integer
+          nullable: true
+          title: Монитор
+        operation_name:
+          type: string
+          minLength: 1
+          title: Наименование операции
+          maxLength: 500
+        diagnosis_name:
+          type: string
+          title: Диагноз
+          maxLength: 500
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Вес, кг
+    PatchedInformationAnesthesiaRequest:
+      type: object
+      properties:
+        anesthesia_methods:
+          type: array
+          items:
+            type: integer
+          description: ID методов анестезии
+        patient_arrived:
+          type: boolean
+          nullable: true
+          title: Пациент доставлен, начат мониторинг, обеспечен венозный доступ
+    PatchedMaintainingAnesthesiaRequest:
+      type: object
+      properties:
+        anesthesia_specificity:
+          type: integer
+          nullable: true
+        index_bis:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+          title: Индекс BIS
+        anesthesia_type:
+          type: integer
+          nullable: true
+        symptomatic_picked:
+          type: boolean
+          nullable: true
+          title: Симптоматическая терапия
+        symptomatic_option:
+          type: string
+          title: Симптоматическая терапия (описание)
+        oropharyngeal_catheter:
+          type: integer
+          nullable: true
+        option_mg:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Доза, мг
+    PatchedOperationWriteRequest:
+      type: object
+      description: Создание/изменение ОС (карточка ОС).
+      properties:
+        patient:
+          type: integer
+          title: Пациент
+        operation_date:
+          type: string
+          format: date
+        operation_time:
+          type: string
+          format: time
+          nullable: true
+          title: Время поступления в операционную
+        pid:
+          type: string
+          title: PID пациента в мониторах
+          maxLength: 64
+        type_operation:
+          type: integer
+          title: Тип операции
+        operation_name:
+          type: string
+          minLength: 1
+          title: Наименование операции
+          maxLength: 500
+        operation_code:
+          type: string
+          title: Код операции
+          maxLength: 64
+        diagnosis:
+          type: integer
+          nullable: true
+          title: Диагноз (МКБ-10)
+        diagnosis_name:
+          type: string
+          title: Диагноз
+          maxLength: 500
+        history_number:
+          type: string
+          title: Номер истории болезни
+          maxLength: 64
+        doctor:
+          type: integer
+          nullable: true
+        nurse:
+          type: integer
+          nullable: true
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Вес, кг
+    PatchedPatientRequest:
+      type: object
+      properties:
+        surname:
+          type: string
+          minLength: 1
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          minLength: 1
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        sex:
+          type: integer
+          title: Пол
+        birthdate:
+          type: string
+          format: date
+          title: Дата рождения
+        blood_group:
+          type: integer
+          title: Группа крови
+        blood_rh:
+          type: integer
+          title: Резус-фактор
+        snils:
+          type: string
+          pattern: ^[0-9\s-]*$
+          maxLength: 20
+        enp:
+          type: string
+          pattern: ^[0-9A-Za-z\s-]*$
+          maxLength: 32
+    PatchedPatientTransferredRequest:
+      type: object
+      properties:
+        b_scale_meyo:
+          nullable: true
+        b_scale_glazgo:
+          nullable: true
+        t_scale_meyo:
+          nullable: true
+        t_scale_glazgo:
+          nullable: true
+        b_time:
+          type: string
+          format: time
+          nullable: true
+        b_ad:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+          title: АД (начало транспортировки)
+        b_ps:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        b_spo2:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        b_breath_rate:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        b_cvp:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_time:
+          type: string
+          format: time
+          nullable: true
+        t_ad:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+          title: АД (момент передачи)
+        t_ps:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_spo2:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        t_breath_rate:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_cvp:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        atropine:
+          type: number
+          format: double
+          nullable: true
+          title: Атропин, мг
+        proserine:
+          type: number
+          format: double
+          nullable: true
+          title: Прозерин, мг
+        sugammadex:
+          type: number
+          format: double
+          nullable: true
+          title: Сугаммадекс, мг
+        is_decurarisation:
+          type: boolean
+          nullable: true
+          title: Декураризация
+        is_effective_breathing:
+          type: boolean
+          nullable: true
+        is_regaining_consciousness:
+          type: boolean
+          nullable: true
+        is_extubation:
+          type: boolean
+          nullable: true
+        is_extended_ventilation:
+          type: boolean
+          nullable: true
+          title: Продлённая ИВЛ
+        is_died:
+          type: boolean
+          nullable: true
+          title: Летальный исход
+        effective_breathing:
+          type: number
+          format: double
+          nullable: true
+          title: Восстановление дыхания через, мин
+        regaining_consciousness:
+          type: number
+          format: double
+          nullable: true
+          title: Восстановление сознания через, мин
+        extubation:
+          type: number
+          format: double
+          nullable: true
+          title: Экстубация через, мин
+    PatchedPidDateTimeRequest:
+      type: object
+      properties:
+        operation_date:
+          type: string
+          format: date
+          nullable: true
+        operation_time:
+          type: string
+          format: time
+          nullable: true
+        pid:
+          type: string
+          title: PID пациента в мониторах
+          maxLength: 64
+    PatchedPremedicationRequest:
+      type: object
+      properties:
+        oxygen_mask_size:
+          type: integer
+          nullable: true
+          title: Размер кислородной маски
+        is_oxygen_insufflation:
+          type: boolean
+          nullable: true
+          title: Инсуффляция кислорода
+        pharynx_tamponade:
+          type: boolean
+          nullable: true
+          title: Тампонада глотки
+        rass:
+          type: integer
+          nullable: true
+        note:
+          type: string
+          title: Примечание
+    PatchedProtocolPatientInfoRequest:
+      type: object
+      properties:
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Вес, кг
+        complaints_patient:
+          type: string
+          title: Жалобы пациента
+        features_anamnesis:
+          type: string
+          title: Особенности анамнеза
+    PatchedRedirectingPatientRequest:
+      type: object
+      properties:
+        department_type:
+          type: integer
+          nullable: true
+        department:
+          type: integer
+          nullable: true
+        doctor_fio:
+          type: string
+          title: ФИО принимающего врача
+          maxLength: 255
+    PatchedTubeMaskInstallationRequest:
+      type: object
+      properties:
+        tube_installed:
+          type: boolean
+          nullable: true
+          title: Трубка установлена
+        attempts:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          title: Количество попыток
+        intubation_method:
+          title: Метод интубации
+          oneOf:
+          - $ref: '#/components/schemas/IntubationMethodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        laryngeal_tube:
+          $ref: '#/components/schemas/LaryngealTubeRequest'
+        intubation_tube:
+          $ref: '#/components/schemas/IntubationTubeRequest'
+        endobronchial_tube:
+          $ref: '#/components/schemas/EndobronchialTubeRequest'
+        laryngoscopy:
+          $ref: '#/components/schemas/LaryngoscopyRequest'
+        sanacia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SanationRequest'
+    PatchedUserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          title: Логин
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        surname:
+          type: string
+          minLength: 1
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          minLength: 1
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+          title: Дата рождения
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Роль
+          minimum: 0
+          maximum: 32767
+        is_active:
+          type: boolean
+          title: Активен
+        employee_code:
+          type: string
+          title: Код сотрудника
+          maxLength: 64
+        speciality:
+          type: string
+          title: Специальность
+          maxLength: 255
+        department:
+          type: string
+          title: Отделение
+          maxLength: 255
+        job_title:
+          type: string
+          title: Должность
+          maxLength: 255
+    PatchedVentilatorRequest:
+      type: object
+      properties:
+        ventilator:
+          type: integer
+          nullable: true
+        monitoring:
+          type: integer
+          nullable: true
+        patient_status:
+          type: integer
+          nullable: true
+        patient_status_value:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        chamber:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Палата
+        bed:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Койка
+        note:
+          type: string
+          title: Примечание
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PatientStatusEnum'
+          readOnly: true
+          title: Статус карточки
+        status_display:
+          type: string
+          readOnly: true
+        surname:
+          type: string
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        sex:
+          type: integer
+          title: Пол
+        sex_name:
+          type: string
+          readOnly: true
+        birthdate:
+          type: string
+          format: date
+          title: Дата рождения
+        blood_group:
+          type: integer
+          title: Группа крови
+        blood_group_name:
+          type: string
+          readOnly: true
+        blood_rh:
+          type: integer
+          title: Резус-фактор
+        blood_rh_name:
+          type: string
+          readOnly: true
+        snils:
+          type: string
+          pattern: ^[0-9\s-]*$
+          maxLength: 20
+        enp:
+          type: string
+          pattern: ^[0-9A-Za-z\s-]*$
+          maxLength: 32
+        height:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+          description: Рост из последнего ОС
+        weight:
+          type: number
+          format: double
+          nullable: true
+          readOnly: true
+          description: Вес из последнего ОС
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationBrief'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создана
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Изменена
+      required:
+      - birthdate
+      - blood_group
+      - blood_group_name
+      - blood_rh
+      - blood_rh_name
+      - created_at
+      - firstname
+      - full_name
+      - height
+      - id
+      - operations
+      - sex
+      - sex_name
+      - status
+      - status_display
+      - surname
+      - updated_at
+      - weight
+    PatientRequest:
+      type: object
+      properties:
+        surname:
+          type: string
+          minLength: 1
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          minLength: 1
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        sex:
+          type: integer
+          title: Пол
+        birthdate:
+          type: string
+          format: date
+          title: Дата рождения
+        blood_group:
+          type: integer
+          title: Группа крови
+        blood_rh:
+          type: integer
+          title: Резус-фактор
+        snils:
+          type: string
+          pattern: ^[0-9\s-]*$
+          maxLength: 20
+        enp:
+          type: string
+          pattern: ^[0-9A-Za-z\s-]*$
+          maxLength: 32
+      required:
+      - birthdate
+      - blood_group
+      - blood_rh
+      - firstname
+      - sex
+      - surname
+    PatientStatusEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - Новая
+        * `2` - Активная
+        * `3` - Архивная
+    PatientSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        surname:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        full_name:
+          type: string
+        sex:
+          type: integer
+        birthdate:
+          type: string
+          format: date
+        blood_group:
+          type: integer
+        blood_rh:
+          type: integer
+        status:
+          type: integer
+      required:
+      - birthdate
+      - blood_group
+      - blood_rh
+      - firstname
+      - full_name
+      - id
+      - lastname
+      - sex
+      - status
+      - surname
+    PatientTransferred:
+      type: object
+      properties:
+        b_scale_meyo:
+          nullable: true
+        b_scale_glazgo:
+          nullable: true
+        t_scale_meyo:
+          nullable: true
+        t_scale_glazgo:
+          nullable: true
+        operation_duration:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Длительность операции (этап 1 → этап 6), ЧЧ:ММ
+        b_time:
+          type: string
+          format: time
+          nullable: true
+        b_ad:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+          title: АД (начало транспортировки)
+        b_ps:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        b_spo2:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        b_breath_rate:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        b_cvp:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_time:
+          type: string
+          format: time
+          nullable: true
+        t_ad:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+          title: АД (момент передачи)
+        t_ps:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_spo2:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        t_breath_rate:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_cvp:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        atropine:
+          type: number
+          format: double
+          nullable: true
+          title: Атропин, мг
+        proserine:
+          type: number
+          format: double
+          nullable: true
+          title: Прозерин, мг
+        sugammadex:
+          type: number
+          format: double
+          nullable: true
+          title: Сугаммадекс, мг
+        is_decurarisation:
+          type: boolean
+          nullable: true
+          title: Декураризация
+        is_effective_breathing:
+          type: boolean
+          nullable: true
+        is_regaining_consciousness:
+          type: boolean
+          nullable: true
+        is_extubation:
+          type: boolean
+          nullable: true
+        is_extended_ventilation:
+          type: boolean
+          nullable: true
+          title: Продлённая ИВЛ
+        is_died:
+          type: boolean
+          nullable: true
+          title: Летальный исход
+        effective_breathing:
+          type: number
+          format: double
+          nullable: true
+          title: Восстановление дыхания через, мин
+        regaining_consciousness:
+          type: number
+          format: double
+          nullable: true
+          title: Восстановление сознания через, мин
+        extubation:
+          type: number
+          format: double
+          nullable: true
+          title: Экстубация через, мин
+      required:
+      - operation_duration
+    PatientTransferredRequest:
+      type: object
+      properties:
+        b_scale_meyo:
+          nullable: true
+        b_scale_glazgo:
+          nullable: true
+        t_scale_meyo:
+          nullable: true
+        t_scale_glazgo:
+          nullable: true
+        b_time:
+          type: string
+          format: time
+          nullable: true
+        b_ad:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+          title: АД (начало транспортировки)
+        b_ps:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        b_spo2:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        b_breath_rate:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        b_cvp:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_time:
+          type: string
+          format: time
+          nullable: true
+        t_ad:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+          title: АД (момент передачи)
+        t_ps:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_spo2:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        t_breath_rate:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        t_cvp:
+          type: number
+          format: double
+          maximum: 400
+          minimum: 0
+          nullable: true
+        atropine:
+          type: number
+          format: double
+          nullable: true
+          title: Атропин, мг
+        proserine:
+          type: number
+          format: double
+          nullable: true
+          title: Прозерин, мг
+        sugammadex:
+          type: number
+          format: double
+          nullable: true
+          title: Сугаммадекс, мг
+        is_decurarisation:
+          type: boolean
+          nullable: true
+          title: Декураризация
+        is_effective_breathing:
+          type: boolean
+          nullable: true
+        is_regaining_consciousness:
+          type: boolean
+          nullable: true
+        is_extubation:
+          type: boolean
+          nullable: true
+        is_extended_ventilation:
+          type: boolean
+          nullable: true
+          title: Продлённая ИВЛ
+        is_died:
+          type: boolean
+          nullable: true
+          title: Летальный исход
+        effective_breathing:
+          type: number
+          format: double
+          nullable: true
+          title: Восстановление дыхания через, мин
+        regaining_consciousness:
+          type: number
+          format: double
+          nullable: true
+          title: Восстановление сознания через, мин
+        extubation:
+          type: number
+          format: double
+          nullable: true
+          title: Экстубация через, мин
+    PidDateTime:
+      type: object
+      properties:
+        operation_date:
+          type: string
+          format: date
+          nullable: true
+        operation_time:
+          type: string
+          format: time
+          nullable: true
+        pid:
+          type: string
+          title: PID пациента в мониторах
+          maxLength: 64
+      required:
+      - operation_date
+      - operation_time
+    Premedication:
+      type: object
+      properties:
+        oxygen_mask_size:
+          type: integer
+          nullable: true
+          title: Размер кислородной маски
+        is_oxygen_insufflation:
+          type: boolean
+          nullable: true
+          title: Инсуффляция кислорода
+        pharynx_tamponade:
+          type: boolean
+          nullable: true
+          title: Тампонада глотки
+        rass:
+          type: integer
+          nullable: true
+        note:
+          type: string
+          title: Примечание
+    PremedicationRequest:
+      type: object
+      properties:
+        oxygen_mask_size:
+          type: integer
+          nullable: true
+          title: Размер кислородной маски
+        is_oxygen_insufflation:
+          type: boolean
+          nullable: true
+          title: Инсуффляция кислорода
+        pharynx_tamponade:
+          type: boolean
+          nullable: true
+          title: Тампонада глотки
+        rass:
+          type: integer
+          nullable: true
+        note:
+          type: string
+          title: Примечание
+    ProtocolPatientInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        surname:
+          type: string
+          readOnly: true
+        firstname:
+          type: string
+          readOnly: true
+        lastname:
+          type: string
+          readOnly: true
+        birthdate:
+          type: string
+          format: date
+          readOnly: true
+        height:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Рост, см
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          nullable: true
+          title: Вес, кг
+        bmi:
+          type: number
+          format: double
+          readOnly: true
+        complaints_patient:
+          type: string
+          title: Жалобы пациента
+        features_anamnesis:
+          type: string
+          title: Особенности анамнеза
+        operation_code:
+          type: string
+          readOnly: true
+          title: Код операции
+        operation_name:
+          type: string
+          readOnly: true
+          title: Наименование операции
+        diagnosis_name:
+          type: string
+          readOnly: true
+          title: Диагноз
+      required:
+      - birthdate
+      - bmi
+      - diagnosis_name
+      - firstname
+      - id
+      - lastname
+      - operation_code
+      - operation_name
+      - surname
+    RecentPids:
+      type: object
+      properties:
+        pids:
+          type: array
+          items:
+            type: string
+      required:
+      - pids
+    RedirectingPatient:
+      type: object
+      properties:
+        department_type:
+          type: integer
+          nullable: true
+        department:
+          type: integer
+          nullable: true
+        doctor_fio:
+          type: string
+          title: ФИО принимающего врача
+          maxLength: 255
+    RedirectingPatientRequest:
+      type: object
+      properties:
+        department_type:
+          type: integer
+          nullable: true
+        department:
+          type: integer
+          nullable: true
+        doctor_fio:
+          type: string
+          title: ФИО принимающего врача
+          maxLength: 255
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
+    Sanation:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SanationTypeEnum'
+        catheter:
+          type: string
+          default: ''
+          maxLength: 32
+        comment:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - type
+    SanationRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SanationTypeEnum'
+        catheter:
+          type: string
+          default: ''
+          maxLength: 32
+        comment:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - type
+    SanationTypeEnum:
+      enum:
+      - OROPHARYNX
+      - TBD
+      - FBS
+      type: string
+      description: |-
+        * `OROPHARYNX` - OROPHARYNX
+        * `TBD` - TBD
+        * `FBS` - FBS
+    SetPasswordRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+    StaffMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+      required:
+      - full_name
+      - id
+    TransfusionGroup:
+      type: object
+      properties:
+        solution:
+          type: string
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransfusionItem'
+      required:
+      - items
+      - solution
+    TransfusionGroupRequest:
+      type: object
+      properties:
+        solution:
+          type: string
+          minLength: 1
+          maxLength: 255
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransfusionItemRequest'
+      required:
+      - items
+      - solution
+    TransfusionItem:
+      type: object
+      properties:
+        gemakon:
+          type: string
+          description: Номер/объём гемакона
+          maxLength: 64
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - gemakon
+      - time_start
+    TransfusionItemRequest:
+      type: object
+      properties:
+        gemakon:
+          type: string
+          minLength: 1
+          description: Номер/объём гемакона
+          maxLength: 64
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - gemakon
+      - time_start
+    TubeInstallationPick:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tube_type:
+          type: integer
+          title: Тип трубки
+        option:
+          type: string
+          title: Опция
+          maxLength: 32
+        combi_tube_size:
+          type: integer
+          nullable: true
+        intubation_tube_size:
+          type: integer
+          nullable: true
+        pressure_type:
+          type: integer
+          nullable: true
+        tube_installed:
+          type: boolean
+          nullable: true
+          title: Трубка установлена
+        attempts:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          title: Количество попыток
+      required:
+      - id
+      - tube_type
+    TubeInstallationPickRequest:
+      type: object
+      properties:
+        tube_type:
+          type: integer
+          title: Тип трубки
+        option:
+          type: string
+          title: Опция
+          maxLength: 32
+        combi_tube_size:
+          type: integer
+          nullable: true
+        intubation_tube_size:
+          type: integer
+          nullable: true
+        pressure_type:
+          type: integer
+          nullable: true
+        tube_installed:
+          type: boolean
+          nullable: true
+          title: Трубка установлена
+        attempts:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          title: Количество попыток
+      required:
+      - tube_type
+    TubeMaskInstallation:
+      type: object
+      properties:
+        tube_installed:
+          type: boolean
+          nullable: true
+          title: Трубка установлена
+        attempts:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          title: Количество попыток
+        intubation_method:
+          title: Метод интубации
+          oneOf:
+          - $ref: '#/components/schemas/IntubationMethodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        laryngeal_tube:
+          $ref: '#/components/schemas/LaryngealTube'
+        intubation_tube:
+          $ref: '#/components/schemas/IntubationTube'
+        endobronchial_tube:
+          $ref: '#/components/schemas/EndobronchialTube'
+        laryngoscopy:
+          $ref: '#/components/schemas/Laryngoscopy'
+        sanacia:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sanation'
+    TubeMaskInstallationRequest:
+      type: object
+      properties:
+        tube_installed:
+          type: boolean
+          nullable: true
+          title: Трубка установлена
+        attempts:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          title: Количество попыток
+        intubation_method:
+          title: Метод интубации
+          oneOf:
+          - $ref: '#/components/schemas/IntubationMethodEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        laryngeal_tube:
+          $ref: '#/components/schemas/LaryngealTubeRequest'
+        intubation_tube:
+          $ref: '#/components/schemas/IntubationTubeRequest'
+        endobronchial_tube:
+          $ref: '#/components/schemas/EndobronchialTubeRequest'
+        laryngoscopy:
+          $ref: '#/components/schemas/LaryngoscopyRequest'
+        sanacia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SanationRequest'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Логин
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        surname:
+          type: string
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+          title: Дата рождения
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Роль
+          minimum: 0
+          maximum: 32767
+        role_display:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Активен
+        employee_code:
+          type: string
+          title: Код сотрудника
+          maxLength: 64
+        speciality:
+          type: string
+          title: Специальность
+          maxLength: 255
+        department:
+          type: string
+          title: Отделение
+          maxLength: 255
+        job_title:
+          type: string
+          title: Должность
+          maxLength: 255
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Последний вход
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Создан
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Изменён
+      required:
+      - created_at
+      - firstname
+      - full_name
+      - id
+      - last_login
+      - role_display
+      - surname
+      - updated_at
+      - username
+    UserCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          title: Логин
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        surname:
+          type: string
+          minLength: 1
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          minLength: 1
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+          title: Дата рождения
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Роль
+          minimum: 0
+          maximum: 32767
+        is_active:
+          type: boolean
+          title: Активен
+        employee_code:
+          type: string
+          title: Код сотрудника
+          maxLength: 64
+        speciality:
+          type: string
+          title: Специальность
+          maxLength: 255
+        department:
+          type: string
+          title: Отделение
+          maxLength: 255
+        job_title:
+          type: string
+          title: Должность
+          maxLength: 255
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+      required:
+      - firstname
+      - password
+      - surname
+      - username
+    UserRoleEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      type: integer
+      description: |-
+        * `1` - Врач
+        * `2` - Медсестра/Медбрат
+        * `3` - Администратор
+        * `4` - Заведующий отделением
+        * `5` - ИО заведующего отделением
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          title: Логин
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        surname:
+          type: string
+          minLength: 1
+          title: Фамилия
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        firstname:
+          type: string
+          minLength: 1
+          title: Имя
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        lastname:
+          type: string
+          title: Отчество
+          pattern: ^[\u0401\u0451A-Za-z\u0410-\u042f\u0430-\u044f\s-]+$
+          maxLength: 150
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+          title: Дата рождения
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Роль
+          minimum: 0
+          maximum: 32767
+        is_active:
+          type: boolean
+          title: Активен
+        employee_code:
+          type: string
+          title: Код сотрудника
+          maxLength: 64
+        speciality:
+          type: string
+          title: Специальность
+          maxLength: 255
+        department:
+          type: string
+          title: Отделение
+          maxLength: 255
+        job_title:
+          type: string
+          title: Должность
+          maxLength: 255
+      required:
+      - firstname
+      - surname
+      - username
+    ValueEnum:
+      enum:
+      - ANESTHESIA_START
+      - ANESTHESIA_STOP
+      - INTUBATION
+      - EXTUBATION
+      - PREMEDICATION
+      - INTRODUCTION
+      - TURN
+      - DECURARISATION
+      - BLOCKADE
+      - OPERATION_START
+      - OPERATION_STOP
+      - INFUSION_START
+      - INFUSION_STOP
+      - SPONTANEOUS
+      - SUPPORTIVE
+      - FORCED
+      type: string
+      description: |-
+        * `ANESTHESIA_START` - Начало анестезии
+        * `ANESTHESIA_STOP` - Окончание анестезии
+        * `INTUBATION` - Интубация трахеи
+        * `EXTUBATION` - Экстубация трахеи
+        * `PREMEDICATION` - Премедикация
+        * `INTRODUCTION` - Вводный наркоз
+        * `TURN` - Поворот
+        * `DECURARISATION` - Декураризация
+        * `BLOCKADE` - Блокада
+        * `OPERATION_START` - Начало операции
+        * `OPERATION_STOP` - Окончание операции
+        * `INFUSION_START` - Начало инфузии
+        * `INFUSION_STOP` - Окончание инфузии
+        * `SPONTANEOUS` - Самостоятельное дыхание
+        * `SUPPORTIVE` - Вспомогательное дыхание
+        * `FORCED` - Принудительное дыхание
+    VenousAccess:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        vein:
+          type: integer
+          title: Вена
+        arm:
+          title: Сторона
+          oneOf:
+          - $ref: '#/components/schemas/ArmEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        catheter_type:
+          type: integer
+          nullable: true
+          title: Тип катетера
+        catheter_diameter_1:
+          type: integer
+          nullable: true
+          title: Диаметр (просвет 1)
+        catheter_diameter_2:
+          type: integer
+          nullable: true
+          title: Диаметр (просвет 2)
+        catheter_diameter_3:
+          type: integer
+          nullable: true
+          title: Диаметр (просвет 3)
+      required:
+      - id
+      - vein
+    VenousAccessRequest:
+      type: object
+      properties:
+        vein:
+          type: integer
+          title: Вена
+        arm:
+          title: Сторона
+          oneOf:
+          - $ref: '#/components/schemas/ArmEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        catheter_type:
+          type: integer
+          nullable: true
+          title: Тип катетера
+        catheter_diameter_1:
+          type: integer
+          nullable: true
+          title: Диаметр (просвет 1)
+        catheter_diameter_2:
+          type: integer
+          nullable: true
+          title: Диаметр (просвет 2)
+        catheter_diameter_3:
+          type: integer
+          nullable: true
+          title: Диаметр (просвет 3)
+      required:
+      - vein
+    Ventilator:
+      type: object
+      properties:
+        ventilator:
+          type: integer
+          nullable: true
+        monitoring:
+          type: integer
+          nullable: true
+        patient_status:
+          type: integer
+          nullable: true
+        patient_status_value:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        chamber:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Палата
+        bed:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Койка
+        note:
+          type: string
+          title: Примечание
+    VentilatorRequest:
+      type: object
+      properties:
+        ventilator:
+          type: integer
+          nullable: true
+        monitoring:
+          type: integer
+          nullable: true
+        patient_status:
+          type: integer
+          nullable: true
+        patient_status_value:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        chamber:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Палата
+        bed:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Койка
+        note:
+          type: string
+          title: Примечание
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Токен из `POST /api/auth/login/`.

@@ -1,0 +1,4 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-test-value="bolus">
+<circle cx="12" cy="12" r="10" stroke="#5068A5" stroke-width="2"/>
+<path d="M5 12.0001H15.1384M15.1384 12.0001L10.0692 17.0693M15.1384 12.0001L10.0692 6.93092M16.5465 6.36768V17.6326" stroke="#5068A5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

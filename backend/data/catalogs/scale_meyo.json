@@ -1,0 +1,142 @@
+[
+ {
+  "id": 1,
+  "scale_meyo_head_id": 1,
+  "name": "Не открывает на боль",
+  "description": "",
+  "value": "0"
+ },
+ {
+  "id": 2,
+  "scale_meyo_head_id": 1,
+  "name": "Закрыты, открывает на боль",
+  "description": "",
+  "value": "+1"
+ },
+ {
+  "id": 3,
+  "scale_meyo_head_id": 1,
+  "name": "Закрыты, открывает на громкую команду",
+  "description": "",
+  "value": "+2"
+ },
+ {
+  "id": 4,
+  "scale_meyo_head_id": 1,
+  "name": "Открыты, нет слежения",
+  "description": "",
+  "value": "+3"
+ },
+ {
+  "id": 5,
+  "scale_meyo_head_id": 1,
+  "name": "Самостоятельное слежение, мигание по команде",
+  "description": "",
+  "value": "+4"
+ },
+ {
+  "id": 6,
+  "scale_meyo_head_id": 2,
+  "name": "Отсутствует или генерализованный миоклонус",
+  "description": "",
+  "value": "0"
+ },
+ {
+  "id": 7,
+  "scale_meyo_head_id": 2,
+  "name": "Разгибание в ответ на боль",
+  "description": "",
+  "value": "+1"
+ },
+ {
+  "id": 8,
+  "scale_meyo_head_id": 2,
+  "name": "Сгибание в ответ на боль",
+  "description": "",
+  "value": "+2"
+ },
+ {
+  "id": 9,
+  "scale_meyo_head_id": 2,
+  "name": "Тянет к месту болевого раздражения",
+  "description": "",
+  "value": "+3"
+ },
+ {
+  "id": 10,
+  "scale_meyo_head_id": 2,
+  "name": "\"Отлично\" - показывает большим пальцем",
+  "description": "",
+  "value": "+4"
+ },
+ {
+  "id": 11,
+  "scale_meyo_head_id": 3,
+  "name": "Зрачковый, роговичный и кашлевой рефлексы отсутствуют",
+  "description": "",
+  "value": "0"
+ },
+ {
+  "id": 12,
+  "scale_meyo_head_id": 3,
+  "name": "Зрачковый И роговичный рефлексы отсутствуют",
+  "description": "",
+  "value": "+1"
+ },
+ {
+  "id": 13,
+  "scale_meyo_head_id": 3,
+  "name": "Зрачковый ИЛИ роговичный рефлексы отсутствуют",
+  "description": "",
+  "value": "+2"
+ },
+ {
+  "id": 14,
+  "scale_meyo_head_id": 3,
+  "name": "Один зрачок расширен, не реагирует на свет",
+  "description": "",
+  "value": "+3"
+ },
+ {
+  "id": 15,
+  "scale_meyo_head_id": 3,
+  "name": "Зрачковый и роговичный рефлексы сохранены",
+  "description": "",
+  "value": "+4"
+ },
+ {
+  "id": 16,
+  "scale_meyo_head_id": 4,
+  "name": "Подчинено респиратору или апноэ",
+  "description": "",
+  "value": "0"
+ },
+ {
+  "id": 17,
+  "scale_meyo_head_id": 4,
+  "name": "Чаще частоты респиратора",
+  "description": "",
+  "value": "+1"
+ },
+ {
+  "id": 18,
+  "scale_meyo_head_id": 4,
+  "name": "Не интубирован, нерегулярное",
+  "description": "",
+  "value": "+2"
+ },
+ {
+  "id": 19,
+  "scale_meyo_head_id": 4,
+  "name": "Не интубирован, типа Чейн - Стокса",
+  "description": "",
+  "value": "+3"
+ },
+ {
+  "id": 20,
+  "scale_meyo_head_id": 4,
+  "name": "Не интубирован, нормальное",
+  "description": "",
+  "value": "+4"
+ }
+]

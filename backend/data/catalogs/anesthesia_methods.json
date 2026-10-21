@@ -1,0 +1,56 @@
+[
+ {
+  "id": 1,
+  "type": "GENERAL",
+  "name": "Ингаляционная",
+  "description": ""
+ },
+ {
+  "id": 2,
+  "type": "GENERAL",
+  "name": "Неингаляционная",
+  "description": ""
+ },
+ {
+  "id": 3,
+  "type": "LOCAL",
+  "name": "Аппликационная",
+  "description": ""
+ },
+ {
+  "id": 4,
+  "type": "LOCAL",
+  "name": "Инфильтрационная",
+  "description": ""
+ },
+ {
+  "id": 5,
+  "type": "LOCAL",
+  "name": "Проводниковая",
+  "description": ""
+ },
+ {
+  "id": 6,
+  "type": "LOCAL",
+  "name": "Плексусная",
+  "description": ""
+ },
+ {
+  "id": 7,
+  "type": "LOCAL",
+  "name": "Эпидуральная",
+  "description": ""
+ },
+ {
+  "id": 8,
+  "type": "LOCAL",
+  "name": "Спинальная (субарахноидальная)",
+  "description": ""
+ },
+ {
+  "id": 9,
+  "type": "LOCAL",
+  "name": "Каудальная",
+  "description": ""
+ }
+]

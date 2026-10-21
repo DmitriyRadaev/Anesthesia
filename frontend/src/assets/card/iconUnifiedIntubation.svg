@@ -1,0 +1,12 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-test-value="intubation">
+<g clip-path="url(#clip0_4443_16033)">
+<line x1="1.64645" y1="22.6464" x2="22.6464" y2="1.64645" stroke="#7B868C"/>
+<path d="M18.5732 12.0469V22H16.3516V12.0469H18.5732ZM21.6016 12.0469V13.7764H13.3848V12.0469H21.6016Z" fill="#FFB900"/>
+<path d="M6 9.91304C8.20914 9.91304 10 8.14165 10 5.95652C10 3.77139 8.20914 2 6 2C3.79086 2 2 3.77139 2 5.95652C2 8.14165 3.79086 9.91304 6 9.91304ZM6 9.91304L6 15M6 15L3.71429 12.7391M6 15L8.28571 12.7391" stroke="#FFB900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_4443_16033">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

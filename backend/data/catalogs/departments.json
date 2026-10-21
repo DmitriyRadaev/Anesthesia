@@ -1,0 +1,68 @@
+[
+ {
+  "id": 1,
+  "name": "Отделение сосудистой хирургии №1 КФХ",
+  "description": "",
+  "department_type_id": 1
+ },
+ {
+  "id": 2,
+  "name": "Отделение сосудистой хирургии №2 КФХ",
+  "description": "",
+  "department_type_id": 1
+ },
+ {
+  "id": 3,
+  "name": "Хирургическое отделение №1 (эндокринной хирургии)",
+  "description": "",
+  "department_type_id": 1
+ },
+ {
+  "id": 4,
+  "name": "Хирургическое отделение №2 (эндокринной хирургии)",
+  "description": "",
+  "department_type_id": 1
+ },
+ {
+  "id": 5,
+  "name": "Отделение сосудистой хирургии №1 КФХ",
+  "description": "",
+  "department_type_id": 2
+ },
+ {
+  "id": 6,
+  "name": "Отделение сосудистой хирургии №2 КФХ",
+  "description": "",
+  "department_type_id": 2
+ },
+ {
+  "id": 7,
+  "name": "Хирургическое отделение №1 (эндокринной хирургии)",
+  "description": "",
+  "department_type_id": 2
+ },
+ {
+  "id": 8,
+  "name": "Хирургическое отделение №2 (эндокринной хирургии)",
+  "description": "",
+  "department_type_id": 2
+ },
+ {
+  "id": 9,
+  "name": "Отделение анестезиологии-реанимации (ОАР)",
+  "description": "",
+  "department_type_id": 3
+ },
+ {
+  "id": 10,
+  "name": "Отделение реанимации и интенсивной терапии (ОРИТ)",
+  "description": "",
+  "department_type_id": 3
+ },
+ {
+  "id": 11,
+  "name": "Палата пробуждения",
+  "description": "",
+  "department_type_id": 4
+ }
+]

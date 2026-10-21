@@ -1,0 +1,26 @@
+[
+  {
+    "username": "head",
+    "role": "head",
+    "surname": "Заведующий",
+    "firstname": "Тестовый",
+    "lastname": "",
+    "job_title": "Заведующий отделением анестезиологии"
+  },
+  {
+    "username": "doctor",
+    "role": "doctor",
+    "surname": "Тестов",
+    "firstname": "Анестезиолог",
+    "lastname": "Иванович",
+    "speciality": "Анестезиолог-реаниматолог"
+  },
+  {
+    "username": "nurse",
+    "role": "nurse",
+    "surname": "Медсестра",
+    "firstname": "Анестезист",
+    "lastname": "",
+    "job_title": "Медицинская сестра-анестезист"
+  }
+]

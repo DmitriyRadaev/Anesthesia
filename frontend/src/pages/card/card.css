@@ -1,0 +1,472 @@
+/* Стили наркозной карты, перенесённые из исходной системы (App.css, Premedication.css, *IconPick.css, …). */
+
+.anes-card {
+  font-family: Roboto, "Segoe UI", Arial, sans-serif;
+  color: #5068a5;
+  user-select: none;
+}
+
+.anes-card input,
+.anes-card textarea,
+.anes-card select {
+  user-select: text;
+}
+
+/* --- поля ввода ----------------------------------------------------------------------------- */
+.anes-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 13px;
+  color: #5068a5;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.anes-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  background: linear-gradient(180deg, #f9fbfd, #f6fbff);
+  border: 1px solid #d0daf7;
+  border-radius: 8px;
+  color: #5068a5;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 6px 10px;
+}
+.anes-input:focus {
+  border-color: #5068a5;
+  outline: none;
+}
+.anes-input:disabled {
+  color: #91a0c6;
+  cursor: not-allowed;
+}
+.anes-input.invalid {
+  border-color: #ff3c3c;
+}
+.anes-input::placeholder {
+  color: #91a0c6;
+  font-weight: 400;
+  font-size: 13px;
+}
+textarea.anes-input {
+  height: auto;
+  resize: none;
+}
+.anes-error {
+  color: #ff3c3c;
+  font-size: 12px;
+  margin-top: 2px;
+}
+.anes-adornment {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #91a0c6;
+  font-size: 13px;
+}
+
+/* --- кнопки ----------------------------------------------------------------------------------- */
+.anes-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 7px 20px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 1px 7px 20px rgb(119 142 239 / 30%);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.anes-btn.primary {
+  background: linear-gradient(25.41deg, #9cbff4 7.18%, #444be7 79.43%);
+  color: #fff;
+}
+.anes-btn.primary:hover {
+  background: linear-gradient(92.04deg, #c2ceef 17.38%, #92a9e9 91.35%);
+}
+.anes-btn.secondary {
+  background: linear-gradient(105.79deg, #f4f7fe 11.88%, #e1e6f3 96.16%);
+  color: #5068a5;
+}
+.anes-btn.secondary:hover {
+  background: linear-gradient(25.41deg, #9cbff4 7.18%, #444be7 79.43%);
+  color: #fff;
+}
+.anes-btn:disabled {
+  cursor: not-allowed;
+  box-shadow: none;
+  background: #fff;
+  border: 1px solid lightgrey;
+  color: lightgrey;
+}
+.anes-btn svg path {
+  fill: currentColor;
+}
+
+/* --- аккордеоны ------------------------------------------------------------------------------- */
+.anes-accordion-title {
+  color: #91a0c6;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 23px;
+}
+.anes-delimiter {
+  border: none;
+  border-top: 1px dashed #d0daf7;
+  height: 0;
+  margin: 20px 0;
+}
+
+/* --- три таблицы: фиксированная колонка, прокручиваемые ячейки времени, «Итого» -------------------- */
+.anes-tables {
+  display: flex;
+  flex-direction: row;
+}
+.anes-tables .left {
+  width: 300px;
+  flex: none;
+}
+.anes-tables .scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-color: #afbcdd #ffffff;
+}
+.anes-tables .right {
+  width: 50px;
+  flex: none;
+}
+.anes-tables table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.anes-tables th,
+.anes-tables td {
+  border: 0.5px solid #d0daf7;
+}
+.anes-tables th {
+  background: #eaeff4;
+  padding: 4px 10px;
+  height: 36px;
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 12px;
+  color: #91a0c6;
+  text-align: center;
+  white-space: nowrap;
+}
+.anes-tables td {
+  height: 52px;
+  padding: 11px 10px;
+  text-align: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  min-width: 43px;
+  max-width: 43px;
+  color: #91a0c6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #f9fbfd 0%, #f6fbff 100%);
+}
+.anes-tables .scroll td {
+  padding: 11px 6px;
+  text-overflow: clip;
+}
+.anes-tables .left td {
+  max-width: 300px;
+}
+.anes-tables .right td {
+  min-width: 50px;
+  max-width: 80px;
+  font-size: 12px;
+  padding: 4px;
+  color: #5068a5;
+}
+.anes-tables td.blocked {
+  background: #eaeff4;
+}
+.anes-tables tr.pressure td {
+  height: 70.5px;
+  white-space: pre-line;
+  line-height: 14px;
+  font-size: 12px;
+}
+.anes-tables td.clickable {
+  cursor: pointer;
+}
+.anes-tables td.pick {
+  cursor: not-allowed;
+}
+.anes-tables td.pick.active {
+  cursor: pointer;
+  color: #5068a5;
+  font-weight: 500;
+}
+.anes-cell-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 28px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  color: #91a0c6;
+}
+.anes-cell-inner.active {
+  color: #5068a5;
+}
+.anes-cell-inner > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.anes-cell-icon svg {
+  display: block;
+  max-height: 24px;
+}
+
+.anes-add {
+  cursor: pointer;
+  display: inline-flex;
+}
+.anes-add svg {
+  fill: #91a0c6;
+}
+.anes-add:hover svg {
+  fill: #5068a5;
+}
+
+/* переключатель интервала 05/10/15 */
+.anes-interval {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.anes-interval button {
+  cursor: pointer;
+  display: inline-flex;
+}
+.anes-interval button svg path {
+  fill: #5068a5;
+}
+.anes-interval button svg rect {
+  stroke: #5068a5;
+}
+.anes-interval button:disabled {
+  cursor: not-allowed;
+}
+.anes-interval button:disabled svg path {
+  fill: #91a0c6;
+}
+.anes-interval button:disabled svg rect {
+  stroke: #91a0c6;
+}
+.anes-interval span {
+  color: #91a0c6;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* --- палитры пиктограмм ----------------------------------------------------------------------- */
+.pick-title {
+  color: #5068a5;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+.pick-explanation {
+  color: #5068a5;
+  opacity: 0.6;
+  font-size: 13px;
+}
+.pick-list {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 16px;
+  padding: 0;
+  margin: 16px 0;
+  list-style: none;
+}
+.pick-list.column {
+  flex-direction: column;
+}
+.pick-item {
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+.pick-item.framed {
+  border: 1px solid #5068a566;
+  border-radius: 10px;
+  padding: 5px 0 5px 5px;
+}
+.pick-icon {
+  cursor: pointer;
+  padding: 6px 16px;
+  border: 1px solid #5068a566;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+.pick-icon:hover {
+  background-color: #eaf0ff;
+}
+.pick-icon.active {
+  border-color: transparent;
+  background: linear-gradient(25deg, #9cbff4 0%, #444be7 100%);
+  box-shadow: 0 0 50px 0 #85a2ec4d;
+}
+.pick-icon.active svg path,
+.pick-icon.active svg rect {
+  fill: #fff;
+  stroke: #fff;
+}
+.pick-icon.active svg line {
+  stroke: #fff;
+}
+.pick-intervals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px;
+}
+.pick-intervals.framed {
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px solid #5068a566;
+  border-radius: 10px;
+  min-height: 44px;
+  flex: 1;
+}
+.pick-interval {
+  cursor: pointer;
+  padding: 8px;
+  border: 1px solid #5068a566;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #5068a5;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: transparent;
+}
+.pick-interval:hover {
+  background-color: #eaf0ff;
+}
+
+/* мерцание предвыбранной пиктограммы в ячейке (одиночный щелчок) */
+.prechoiced svg path,
+.prechoiced svg line,
+.prechoiced svg rect {
+  animation: anes-flicker 0.8s ease-in-out infinite;
+}
+@keyframes anes-flicker {
+  0% {
+    fill: #ffffff;
+    stroke: #ffffff;
+  }
+  50% {
+    fill: #d0daf7;
+    stroke: #d0daf7;
+  }
+  100% {
+    fill: #ffffff;
+    stroke: #ffffff;
+  }
+}
+
+/* --- блок сведений о пациенте ---------------------------------------------------------------- */
+.card-patientinfo {
+  background: linear-gradient(92.04deg, #f2f5fc 17.38%, #edf1fa 91.35%);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 18px;
+}
+.card-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    "A A A A B B B B C C C C"
+    "W W W W W W X X X X X X"
+    "U U U V V V R R R P P P"
+    "D D D E E E F F F G G G"
+    "K K K L L L M M M N N N"
+    "O O O O O O S S S T T T"
+    "O O O O O O Z Z Z . . .";
+}
+@media (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "A" "B" "C" "W" "X" "U" "V" "R" "P" "D" "E" "F" "G" "K" "L" "M" "N" "O" "S" "T" "Z";
+  }
+}
+
+/* --- модальные окна в стиле исходной системы ---------------------------------------------------- */
+.anes-modal-block {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.anes-chosen {
+  background: #eee;
+  border-radius: 5px 5px 0 0;
+  color: #5068a5;
+  font-size: 18px;
+  padding: 10px;
+  margin: 12px 0;
+}
+.anes-icon-btn {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.anes-icon-btn svg {
+  fill: #91a0c6;
+}
+
+.anes-combobox-list {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #d0daf7;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(80 104 165 / 15%);
+  margin-top: 4px;
+}
+.anes-combobox-list li {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #5068a5;
+  cursor: pointer;
+  border-bottom: 1px dashed #d0daf7;
+}
+.anes-combobox-list li:last-child {
+  border-bottom: none;
+}
+.anes-combobox-list li[aria-selected="true"],
+.anes-combobox-list li:hover {
+  background: #5068a5;
+  color: #fff;
+}

@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-app-page text-slate-700 antialiased;
+    min-height: 100vh;
+    scrollbar-color: #afbcdd #ffffff;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+  body {
+    background: white;
+  }
+}

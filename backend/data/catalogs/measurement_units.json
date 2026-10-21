@@ -1,0 +1,37 @@
+[
+ {
+  "id": 1,
+  "name": "mg",
+  "description": ""
+ },
+ {
+  "id": 2,
+  "name": "mcg",
+  "description": ""
+ },
+ {
+  "id": 3,
+  "name": "ml",
+  "description": ""
+ },
+ {
+  "id": 4,
+  "name": "ng",
+  "description": ""
+ },
+ {
+  "id": 5,
+  "name": "Ед",
+  "description": ""
+ },
+ {
+  "id": 6,
+  "name": "ME",
+  "description": ""
+ },
+ {
+  "id": 7,
+  "name": "об.%",
+  "description": ""
+ }
+]

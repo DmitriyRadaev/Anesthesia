@@ -1,0 +1,20 @@
+[
+ {
+  "id": 1,
+  "name": "Экстренная",
+  "code": "TYPE_OPERATION_EMERGENCY",
+  "description": "Экстренная операция"
+ },
+ {
+  "id": 2,
+  "name": "Неотложная",
+  "code": "TYPE_OPERATION_URGENT",
+  "description": "Неотложная операция"
+ },
+ {
+  "id": 3,
+  "name": "Плановая",
+  "code": "TYPE_OPERATION_PLANNED",
+  "description": "Плановая операция"
+ }
+]

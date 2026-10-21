@@ -1,0 +1,17 @@
+[
+ {
+  "id": 1,
+  "name": "Mono",
+  "description": "Тип катетера Mono"
+ },
+ {
+  "id": 2,
+  "name": "Duo",
+  "description": "Тип катетера Duo"
+ },
+ {
+  "id": 3,
+  "name": "Trio",
+  "description": "Тип катетера Trio"
+ }
+]

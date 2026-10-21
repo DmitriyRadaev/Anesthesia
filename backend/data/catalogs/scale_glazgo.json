@@ -1,0 +1,107 @@
+[
+ {
+  "id": 1,
+  "scale_glazgo_head_id": 1,
+  "name": "Спонтанное",
+  "description": "",
+  "value": "4"
+ },
+ {
+  "id": 2,
+  "scale_glazgo_head_id": 1,
+  "name": "По приказанию",
+  "description": "",
+  "value": "3"
+ },
+ {
+  "id": 3,
+  "scale_glazgo_head_id": 1,
+  "name": "На болевое раздражение",
+  "description": "",
+  "value": "2"
+ },
+ {
+  "id": 4,
+  "scale_glazgo_head_id": 1,
+  "name": "Отсутствует",
+  "description": "",
+  "value": "1"
+ },
+ {
+  "id": 5,
+  "scale_glazgo_head_id": 2,
+  "name": "Быстрые ответы",
+  "description": "",
+  "value": "5"
+ },
+ {
+  "id": 6,
+  "scale_glazgo_head_id": 2,
+  "name": "Спутанная речь",
+  "description": "",
+  "value": "4"
+ },
+ {
+  "id": 7,
+  "scale_glazgo_head_id": 2,
+  "name": "Бессмысленные слова",
+  "description": "",
+  "value": "3"
+ },
+ {
+  "id": 8,
+  "scale_glazgo_head_id": 2,
+  "name": "Нечленораздельные звуки",
+  "description": "",
+  "value": "2"
+ },
+ {
+  "id": 9,
+  "scale_glazgo_head_id": 2,
+  "name": "Отсутствует",
+  "description": "",
+  "value": "1"
+ },
+ {
+  "id": 10,
+  "scale_glazgo_head_id": 3,
+  "name": "Целенаправленная в ответ на инструкции",
+  "description": "",
+  "value": "6"
+ },
+ {
+  "id": 11,
+  "scale_glazgo_head_id": 3,
+  "name": "Локализация болевого раздражителя",
+  "description": "",
+  "value": "5"
+ },
+ {
+  "id": 12,
+  "scale_glazgo_head_id": 3,
+  "name": "Отдергивание в ответ на болевое раздражение",
+  "description": "",
+  "value": "4"
+ },
+ {
+  "id": 13,
+  "scale_glazgo_head_id": 3,
+  "name": "Сгибание в ответ на болевое раздражение",
+  "description": "",
+  "value": "3"
+ },
+ {
+  "id": 14,
+  "scale_glazgo_head_id": 3,
+  "name": "Разгибание в ответ на болевое раздражение",
+  "description": "",
+  "value": "2"
+ },
+ {
+  "id": 15,
+  "scale_glazgo_head_id": 3,
+  "name": "Отсутствует",
+  "description": "",
+  "value": "1"
+ }
+]

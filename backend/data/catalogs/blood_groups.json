@@ -1,0 +1,37 @@
+[
+ {
+  "id": 1,
+  "name": "0 (I)",
+  "description": "Первая группа крови 0 (I)"
+ },
+ {
+  "id": 2,
+  "name": "A (II)",
+  "description": "Вторая группа крови A (II)"
+ },
+ {
+  "id": 3,
+  "name": "A2 (II)",
+  "description": "Вторая группа крови A2 (II)"
+ },
+ {
+  "id": 4,
+  "name": "B (III)",
+  "description": "Третья группа крови B (III)"
+ },
+ {
+  "id": 5,
+  "name": "AB (IV)",
+  "description": "Четвертая группа крови AB (IV)"
+ },
+ {
+  "id": 6,
+  "name": "A2B (IV)",
+  "description": "Четвертая группа крови A2B (IV)"
+ },
+ {
+  "id": 7,
+  "name": "Не опр.",
+  "description": "Группа крови не определена"
+ }
+]

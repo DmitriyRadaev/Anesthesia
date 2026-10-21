@@ -1,0 +1,6 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-test-value="anesthesiaStop">
+<line x1="19.3478" y1="1.41421" x2="3.41417" y2="17.3478" stroke="#4850E8" stroke-width="2" stroke-linecap="round"/>
+<line x1="19.3478" y1="6.37076" x2="3.41417" y2="22.3044" stroke="#4850E8" stroke-width="2" stroke-linecap="round"/>
+<line x1="1" y1="-1" x2="23.5335" y2="-1" transform="matrix(0.707107 0.707107 0.707107 -0.707107 3.65222 0)" stroke="#4850E8" stroke-width="2" stroke-linecap="round"/>
+<line x1="1" y1="-1" x2="23.5335" y2="-1" transform="matrix(0.707107 0.707107 0.707107 -0.707107 3.65222 4.95654)" stroke="#4850E8" stroke-width="2" stroke-linecap="round"/>
+</svg>

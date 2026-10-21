@@ -1,0 +1,62 @@
+[
+ {
+  "id": 1,
+  "name": "3.5 - 4.0",
+  "description": ""
+ },
+ {
+  "id": 2,
+  "name": "4.0",
+  "description": ""
+ },
+ {
+  "id": 3,
+  "name": "4.5",
+  "description": ""
+ },
+ {
+  "id": 4,
+  "name": "5.0",
+  "description": ""
+ },
+ {
+  "id": 5,
+  "name": "5.5",
+  "description": ""
+ },
+ {
+  "id": 6,
+  "name": "6.0",
+  "description": ""
+ },
+ {
+  "id": 7,
+  "name": "6.5",
+  "description": ""
+ },
+ {
+  "id": 8,
+  "name": "7.0",
+  "description": ""
+ },
+ {
+  "id": 9,
+  "name": "7.5",
+  "description": ""
+ },
+ {
+  "id": 10,
+  "name": "8.0",
+  "description": ""
+ },
+ {
+  "id": 11,
+  "name": "8.5",
+  "description": ""
+ },
+ {
+  "id": 12,
+  "name": "8.5 - 9.0",
+  "description": ""
+ }
+]
